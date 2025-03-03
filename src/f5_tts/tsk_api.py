@@ -21,7 +21,7 @@ def process_data():
     if not gen_text or not ref_audio or not speed or not seed or not response_type or not output_file_name:
         return jsonify({"error": "Missing ref_audio or gen_text or speed or seed or response_type or output_file_name"}), 400
 
-    output_wave_path = f"output/{output_file_name}"
+    output_wave_path = f"src/f5_tts/output/{output_file_name}"
 
     try:
         wav, sr, spect = f5tts.infer(
@@ -42,10 +42,19 @@ def process_data():
         return {"audio_base64": audio_base64, "message": "TTS generated successfully"}
 
     elif response_type == "file":
-        return send_file(output_wave_path, mimetype="audio/wav")
+        return send_file(f"output/{output_file_name}", mimetype="audio/wav")
            
 def run_api():
     app.run(host='0.0.0.0', port=5000, debug=True)
 
 if __name__ == '__main__':
     run_api()
+
+    # curl --location 'http://localhost:5000/process' \
+    # --form 'ref_audio="src/f5_tts/assets/ref_audio.mp3"' \
+    # --form 'ref_text=""' \
+    # --form 'gen_text="hello"' \
+    # --form 'speed="0.83"' \
+    # --form 'seed="898789898"' \
+    # --form 'response_type="file"' \
+    # --form 'output_file_name="audio0.wav"'
